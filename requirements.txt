@@ -1,0 +1,8 @@
+wxPython
+tendo
+flask
+pywebview
+pyinstaller
+pandas
+pyarrow
+openpyxl
