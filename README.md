@@ -11,3 +11,5 @@ pyinstaller Datafication.spec
 deactivate
 open dist/Datafication
 ```
+
+[Youtube Video](https://youtu.be/mdY5QGljCDQ)
