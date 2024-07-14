@@ -6,6 +6,7 @@ from tendo import singleton
 import socket
 import pandas as pd
 from pathlib import Path
+import sys
 
 app = Flask(__name__)
 wx_app = wx.App(False)
@@ -62,7 +63,7 @@ def choose_many_files():
 
 def convert_many_parquet_to_xlsx():
     paths = choose_many_files()
-    if len(paths)==0:
+    if len(paths) == 0:
         return '<p style="background-color:#FFFACD">No parquet file selected.</p>'
     xlsx_file_name = on_save_file('Excel files (*.xlsx)|*.xlsx')
     if not xlsx_file_name:
@@ -80,19 +81,19 @@ def convert_many_parquet_to_xlsx():
             )
     if len(dictx) == 0:
         return (''.join(errors_list)
-                +'<p style="background-color:#FFFACD">No valid parquet files found.</p>')
+                + '<p style="background-color:#FFFACD">No valid parquet files found.</p>')
     try:
         with pd.ExcelWriter(xlsx_file_name, engine='openpyxl') as writer:
             for sheetname, dataframe in dictx.items():
                 dataframe.to_excel(writer, sheet_name=sheetname, index=False)
         return (
-            ''.join(errors_list)
-            +f'<p style="background-color:#98FB98">Success! Data saved at<br>{xlsx_file_name}</p>'
+                ''.join(errors_list)
+                + f'<p style="background-color:#98FB98">Success! Data saved at<br>{xlsx_file_name}</p>'
         )
     except PermissionError:
         return (
-            ''.join(errors_list)
-            +f'<p style="background-color:pink">{Path(xlsx_file_name).name} is being used by another program.</p>'
+                ''.join(errors_list)
+                + f'<p style="background-color:pink">{Path(xlsx_file_name).name} is being used by another program.</p>'
         )
 
 
@@ -100,14 +101,14 @@ def convert_many_parquet_to_xlsx():
 def appx():
     query_params = request.args
     mode = query_params.get('mode', None)
-    if mode=='MANY_PARQUET_TO_ONE_XLSX':
+    if mode == 'MANY_PARQUET_TO_ONE_XLSX':
         conversion_response = convert_many_parquet_to_xlsx()
     else:
-        conversion_response=''
-    html_output=f'''
+        conversion_response = ''
+    html_output = f'''
     <div style="width:300px;word-break: break-all;">
         <a href='/?mode=MANY_PARQUET_TO_ONE_XLSX' onclick='this.remove()' >Convert many parquet files into one xlsx.<br></a>
-        {'<p><u>Previous Operation Log</u></p>'+conversion_response if conversion_response else ''}
+        {'<p><u>Previous Operation Log</u></p>' + conversion_response if conversion_response else ''}
     </div>
     '''
     return Response(html_output, content_type='text/html')
@@ -117,11 +118,10 @@ if __name__ == '__main__':
     try:
         me = singleton.SingleInstance()
     except:
-        exit()
-    port_no = select_port()
-    import os
+        sys.exit()
 
-    print(os.getcwd())
+    port_no = select_port()
+
     # Run Flask in a separate thread
     thread = Thread(target=lambda: app.run(port=port_no, use_reloader=False))
     thread.daemon = True
